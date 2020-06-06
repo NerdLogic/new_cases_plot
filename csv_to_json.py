@@ -1,6 +1,8 @@
-#state 
-#dates
-#new_cases
+# Created by Era Iyer
+# June 2020
+# csv_to_json.py file
+# parses through csv NYT data, creates json file with state, dates, total cases, 
+# new cases, and rolling average cases 
 
 
 import csv
@@ -28,7 +30,7 @@ for index, row in data.iterrows():
 
 arr = []
 for idx, val in enumerate(us_states):
-    state_dict = {"state":val, "dates": [], "total_cases": [], "new_cases": []}
+    state_dict = {"state":val, "dates": [], "total_cases": [], "new_cases": [], "avg_cases":[]}
     for i, states_name in enumerate(states):
         if states[i] == val: 
             state_dict["dates"].append(dates[i])
@@ -41,7 +43,14 @@ for idx, val in enumerate(us_states):
                 new_cases = 0
         state_dict["new_cases"].append(new_cases)
 
+    window = 7
+    numbers_series = pd.Series(state_dict["new_cases"])
+    avg_series = numbers_series.rolling(window=window, min_periods=1, center=True).mean()
+    moving_averages_list = avg_series.tolist()
+    state_dict["avg_cases"] = moving_averages_list
+
     arr.append(state_dict)
+
 
 
 with open('result.json', 'w') as fp:

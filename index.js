@@ -397,7 +397,7 @@ function populate(x, y, state, color){
      
       for(var i = 0; i < data[selectedIndex].dates.length; i++){
           //pushes date and value into array, similar to x, y coordinates on a graph
-          dataset.push({ x : d3.timeParse("%Y-%m-%d")(data[selectedIndex].dates[i]), y : data[selectedIndex].new_cases[i] }); 
+          dataset.push({ x : d3.timeParse("%Y-%m-%d")(data[selectedIndex].dates[i]), y : data[selectedIndex].avg_cases[i] }); 
       }
 
       // setting time scale for x axis based on date
@@ -425,7 +425,7 @@ function populate(x, y, state, color){
           .datum(dataset)
           .attr("fill", "none")
           .attr("stroke", color)
-          .attr("stroke-width", 0.75)
+          .attr("stroke-width", 1.25)
           .attr("transform", "translate(" + [x,y] + ")")  //translate line based on x and y position
           .attr("d", line)
   });
