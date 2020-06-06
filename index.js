@@ -239,7 +239,7 @@ function getColor(state){
         .attr("dy", "1em")
         .style("font-size", "14px")
         .style("text-anchor", "middle")
-        .text("New Cases");      
+        .text("Daily New Cases");      
 
       //add title to graph
       g_svg.append("text")     
