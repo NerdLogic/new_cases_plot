@@ -9,8 +9,6 @@ var csv_arr = []; //global array to hold certain values from csv file
 fillArr();  //populates csv array [{state, color},{state, color}, {state, color},...]
 
 var margin = {top:20, right:20, bottom:20, left:20},
-// width = 1200 - margin.left - margin.right,
-// height = 700 - margin.top - margin.bottom;
   width = window.innerWidth - margin.left - margin.right,
   height = window.innerHeight - margin.top - margin.bottom;
 
@@ -52,7 +50,6 @@ var column = row.selectAll(".cell")
     .enter()
     .append("rect")
     .attr("class", "cell")
-    // .attr("x", function(d) { return d.x + width/cols; }) 
     .attr("x", function(d) { return d.x + width; }) 
     .attr("y", function(d) { return d.y; })
     .attr("width", function(d) { return d.width; })
@@ -93,8 +90,6 @@ function ready(error, data, links) {
     states.enter()
         .append("rect")
           .attr("class", function(d) {return "state " + d.code; })
-          // .attr("x", function(d) { return width/cols+(d.col - 1) * cellSize; })
-          // .attr("y", function(d) { return (d.row - 1) * cellSize; })
           .attr("x", function(d) { return (d.col - 1) * cellSize; })
           .attr("y", function(d) { return (d.row - 1) * cellSize; })
           .attr("width", cellSize)
@@ -116,11 +111,10 @@ function ready(error, data, links) {
         .append("text")
           .attr("class", function(d) { return "label " + d.code; })
           .attr("x", function(d) {
-            // return (width/cols + (d.col - 1) * cellSize) + (cellSize / 2 - margin.left);
-            return ((d.col - 1) * cellSize) + (cellSize / 2 - margin.left);
+            return ((d.col - 1) * cellSize) + (cellSize / 2 - (margin.left*1.5));
           })
           .attr("y", function(d) {
-            return ((d.row - 1) * cellSize) + (cellSize /2 - margin.top);
+            return ((d.row - 1) * cellSize) + (cellSize /2 - (margin.top*1.5));
           })
           .style("text-anchor", "middle")
           .text(function(d) { return d.code; });
@@ -199,17 +193,16 @@ function getColor(state){
 
    
     //opening json file to read data only from the selected index 
-    d3.json("https://raw.githubusercontent.com/obuchel/classification/master/classification/data2_8.json", function(data) {
+      d3.json("./result.json", function(data) {
       //determine index from JSON corresponding to state name
-      var selectedIndex = data.findIndex(obj => obj.province==stateName);
+      var selectedIndex = data.findIndex(obj => obj.state==stateName);
       const dataset = [];
 
       var dates = data[selectedIndex].dates;  
-      let id = data[selectedIndex].id;
 
       for(var i = 0; i < data[selectedIndex].dates.length; i++){
           //pushes date and value into array, similar to x, y coordinates on a graph
-          dataset.push({ x : d3.timeParse("%m/%d/%y")(data[selectedIndex].dates[i]), y : data[selectedIndex].value[i] }); 
+          dataset.push({ x : d3.timeParse("%Y-%m-%d")(data[selectedIndex].dates[i]), y : data[selectedIndex].new_cases[i] }); 
       }
       // setting time scale for x axis based on dates  
       var xScale = d3.scaleTime()
@@ -254,7 +247,7 @@ function getColor(state){
                 "translate(" + (w/2) + " ," + 
                             (padding-20) + ")")
         .style("text-anchor", "middle")
-        .text(data[selectedIndex].province)
+        .text(data[selectedIndex].state)
         .style("font-size", "24px")
         .style("fill", "#696969");    
       
@@ -284,7 +277,7 @@ function getColor(state){
         .append("circle")
             .attr("cx", function(d) { return xScale(d.x) } )
             .attr("cy", function(d) { return yScale(d.y) } )
-            .attr("r", 2.5)
+            .attr("r", 2)
             .attr("fill", color)
 
             //interactive feature to see new cases per day
@@ -301,7 +294,7 @@ function getColor(state){
             .on('mouseout', function (d, i) {
               d3.select(this).transition()
                   .duration('200')
-                  .attr("r", 2.5);
+                  .attr("r", 2);
               div.transition()
                   .duration('200')
                   .style("opacity", 0);
@@ -315,9 +308,10 @@ function getColor(state){
 *          *This process of preloading is to get around the asynchronous javascript process*
 */
 function fillArr(){
-  d3.csv("state-colors.csv", function(data) {
+  // d3.csv("state-colors.csv", function(data) {
+    d3.csv("USStateColors.csv", function(data) {
     for(var i = 0; i < data.length; i++){
-      csv_arr.push([data[i].province, data[i].color]); //id, change, old color
+      csv_arr.push([data[i].state, data[i].color]);
     }
   });
 }
@@ -387,22 +381,23 @@ function calcCellSize(w, h, ncol, nrow) {
 *           based on x y position
 */
 function populate(x, y, state, color){
-  // function populate(x, y, state){
 
     var w = cellSize*.75,
         h = cellSize*.75,
         margin = { top: 0, right: 7, bottom: 0, left: 7 };
 
-    d3.json("https://raw.githubusercontent.com/obuchel/classification/master/classification/data2_8.json", function(data) {
+      d3.json("./result.json", function(data) {
+       
       //determine index from JSON corresponding to state name
-      var selectedIndex = data.findIndex(obj => obj.province==state);
+      var selectedIndex = data.findIndex(obj => obj.state==state);
 
       const dataset = [];
 
       var dates = data[selectedIndex].dates;  
+     
       for(var i = 0; i < data[selectedIndex].dates.length; i++){
           //pushes date and value into array, similar to x, y coordinates on a graph
-          dataset.push({ x : d3.timeParse("%m/%d/%y")(data[selectedIndex].dates[i]), y : data[selectedIndex].value[i] }); 
+          dataset.push({ x : d3.timeParse("%Y-%m-%d")(data[selectedIndex].dates[i]), y : data[selectedIndex].new_cases[i] }); 
       }
 
       // setting time scale for x axis based on date
@@ -429,9 +424,8 @@ function populate(x, y, state, color){
         d3.select("svg").append("path")
           .datum(dataset)
           .attr("fill", "none")
-          // .attr("stroke", data[selectedIndex].color)
           .attr("stroke", color)
-          .attr("stroke-width", 1.15)
+          .attr("stroke-width", 0.75)
           .attr("transform", "translate(" + [x,y] + ")")  //translate line based on x and y position
           .attr("d", line)
   });
