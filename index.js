@@ -50,7 +50,7 @@ var column = row.selectAll(".cell")
     .enter()
     .append("rect")
     .attr("class", "cell")
-    .attr("x", function(d) { return d.x + width; }) 
+    .attr("x", function(d) { return d.x; }) 
     .attr("y", function(d) { return d.y; })
     .attr("width", function(d) { return d.width; })
     .attr("height", function(d) { return d.height; })
@@ -114,7 +114,7 @@ function ready(error, data, links) {
             return ((d.col - 1) * cellSize) + (cellSize / 2 - (margin.left*1.5));
           })
           .attr("y", function(d) {
-            return ((d.row - 1) * cellSize) + (cellSize /2 - (margin.top*1.5));
+            return ((d.row - 1) * cellSize) + (cellSize /2 - (margin.top*1.15));
           })
           .style("text-anchor", "middle")
           .text(function(d) { return d.code; });
@@ -219,7 +219,7 @@ function getColor(state){
 
       //draw x axis in modal
       g_svg.append("g")
-        .attr("transform", "translate(0," + (h - padding) + ")")
+        .attr("transform", "translate("+padding*0.5+"," + (h - padding) + ")")
         .call(xAxis)
         .selectAll("text")
         .attr("dy", ".25em")
@@ -229,7 +229,7 @@ function getColor(state){
 
       //draw y axis in modal
       g_svg.append("g")
-        .attr("transform", "translate("+padding+",0)")
+        .attr("transform", "translate("+padding*1.5+",0)")
         .call(yAxis);
 
       g_svg.append("text")
@@ -260,12 +260,33 @@ function getColor(state){
       g_svg.append("path")
         .datum(dataset)
         .attr("fill", "none")
+        .attr("transform", "translate("+padding*0.5+",0)")
         .attr("stroke", color)
-        .attr("stroke-width", 1.15)
+        .attr("stroke-width", 1.5)
         .attr("d", line)
+        
+      const area = d3.area()
+        .x(function(d) { return xScale(d.x); })
+        .y0(h-padding)
+        .y1(function(d) { return yScale(d.y); });
+
+        g_svg.append("path")
+        .datum(dataset)
+        .attr("class", "area")
+        .attr("transform", "translate("+padding*0.5+",0)")
+        .attr("fill", color)
+        .attr("opacity", "0.2")
+        .attr("cursor", "pointer")
+        .attr("d", area);
+
 
       var div = d3.select("#graphInfo").append("div")
         .attr("class", "tooltip")
+        .style("position", "absolute")
+        .style("background-color", "white")
+        .style("border", "dotted")
+        .style("border-width", "1px")
+        .style("border-radius", "3px")
         .style("opacity", 0);
 
       //place dots to represent all x y coordinates 
@@ -273,12 +294,14 @@ function getColor(state){
         .append("g")
         .selectAll("dot")
         .data(dataset)
+        
         .enter()
         .append("circle")
             .attr("cx", function(d) { return xScale(d.x) } )
             .attr("cy", function(d) { return yScale(d.y) } )
-            .attr("r", 2)
+            .attr("r", 2.75)
             .attr("fill", color)
+            .attr("transform", "translate("+padding*0.5+",0)")
 
             //interactive feature to see new cases per day
             .on('mouseover', function (d, i) {
@@ -289,12 +312,17 @@ function getColor(state){
                     .duration(100)
                     .style("opacity", 1);
               div.html((Math.round(d.y))+" new cases on "+ d3.timeFormat("%B %d")(d.x))
-                    .style("font-size", "14px");
+                    .style("font-size", "12px")
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY) + "px")
+                    .style("padding", "3px")
+                    .style("padding-bottom", "15px");
+                    
             })
             .on('mouseout', function (d, i) {
               d3.select(this).transition()
                   .duration('200')
-                  .attr("r", 2);
+                  .attr("r", 2.75);
               div.transition()
                   .duration('200')
                   .style("opacity", 0);
@@ -409,13 +437,16 @@ function populate(x, y, state, color){
       var yScale = d3.scaleLinear()
           .domain([0, d3.max(dataset, function (d) { return d.y + 1; })])
           .range([h, margin.top]);
-
-      var xAxis = d3.axisBottom(xScale).tickValues([]);
+      
+      var xAxis = d3.axisBottom(xScale).tickValues([]).tickSizeOuter(0);
       var yAxis = d3.axisLeft(yScale).tickValues([]);
 
-      svg.append("g")
-        .attr("transform", "translate(" + [x,y+h] + ")")  //translate x axis based on x and y position
-        .call(xAxis);
+      //appends black line to bottom of individual graphs 
+      // svg.append("g")
+      //   .attr("transform", "translate(" + [x,y+h] + ")")  //translate x axis based on x and y position
+      //   .call(xAxis);
+
+     
 
         const line = d3.line()
           .x(function(d) { return xScale(d.x) })
@@ -425,9 +456,26 @@ function populate(x, y, state, color){
           .datum(dataset)
           .attr("fill", "none")
           .attr("stroke", color)
-          .attr("stroke-width", 1.25)
+          .attr("stroke-width", 1.5)
           .attr("transform", "translate(" + [x,y] + ")")  //translate line based on x and y position
           .attr("d", line)
+        
+        const area = d3.area()
+          .x(function(d) { return xScale(d.x); })
+          .y0(h)
+          .y1(function(d) { return yScale(d.y); });
+
+        d3.select("svg").append("path")
+          .datum(dataset)
+          .attr("class", "area")
+          .attr("transform", "translate(" + [x,y] + ")")
+          .attr("fill", color)
+          .attr("opacity", "0.2")
+          .attr("cursor", "pointer")
+          .on("click", function(d) {
+              popUpGraph(state, color);             
+          })
+          .attr("d", area);
   });
 }
 
