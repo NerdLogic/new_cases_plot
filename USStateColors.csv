@@ -6,7 +6,7 @@ American Samoa,green
 Arizona,red
 California,red
 Colorado,red
-Connecticut,red
+Connecticut,orange
 District of Columbia,red
 Delaware,red
 Florida,red
@@ -20,10 +20,10 @@ Indiana,red
 Kansas,red
 Kentucky,red
 Louisiana,red
-Massachusetts,red
+Massachusetts,orange
 Maryland,red
 Maine,red
-Michigan,red
+Michigan,orange
 Minnesota,red
 Missouri,red
 Mississippi,red
@@ -52,5 +52,5 @@ Virgin Islands,green
 Vermont,green
 Washington,red
 Wisconsin,red
-West Virginia,orange
+West Virginia,green
 Wyoming,green
