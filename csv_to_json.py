@@ -41,6 +41,9 @@ for idx, val in enumerate(us_states):
             new_cases = state_dict["total_cases"][i] - state_dict["total_cases"][i-1]
         if new_cases < 0:
                 new_cases = 0
+        #special case, fixing error from Michigan data on 6/5
+        if state_dict["state"] == 'Michigan' and state_dict["dates"][i] == '2020-06-05':
+            new_cases = 284
         state_dict["new_cases"].append(new_cases)
 
     window = 7
