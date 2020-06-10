@@ -78,13 +78,10 @@ for i in range(len(allWeekValues)):
     else: 
          setColors.append(colors[2])
 
-    
-#create csv file 
-with open('USStateColors.csv', 'wb') as file:
-    writer = csv.writer(file)
-    writer.writerow(["state", "color"])
 
-    #filling csv file with information JUST about US 
-    #note, this can be modified beyond just US 
+with open('USStateColors.csv', 'w', newline='') as file:
+    fieldnames = ['state', 'color']
+    writer = csv.DictWriter(file, fieldnames=fieldnames)
+    writer.writeheader()
     for i in range(len(province)):
-        writer.writerow([province[i], setColors[i]])
+        writer.writerow({'state': province[i], 'color': setColors[i]})

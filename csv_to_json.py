@@ -47,7 +47,7 @@ for idx, val in enumerate(us_states):
         state_dict["new_cases"].append(new_cases)
 
     window = 7
-    numbers_series = pd.Series(state_dict["new_cases"])
+    numbers_series = pd.Series(state_dict["new_cases"], dtype="float64")
     avg_series = numbers_series.rolling(window=window, min_periods=1, center=True).mean()
     moving_averages_list = avg_series.tolist()
     state_dict["avg_cases"] = moving_averages_list
