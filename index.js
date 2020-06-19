@@ -5,7 +5,7 @@
 // resources: https://bl.ocks.org/officeofjane/2c3ed88c4be050d92765de912d71b7c4 for US grid
 
 
-var csv_arr = []; //global array to hold certain values from csv file
+var csv_arr = []; //global array to hold certain state and color values from csv file
 fillArr();  //populates csv array [{state, color},{state, color}, {state, color},...]
 
 var margin = {top:20, right:20, bottom:20, left:20},
