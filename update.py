@@ -79,7 +79,7 @@ for i in range(len(allWeekValues)):
          setColors.append(colors[2])
 
 
-with open('USStateColors.csv', 'w', newline='') as file:
+with open('USStateColors.csv', 'wb') as file:
     fieldnames = ['state', 'color']
     writer = csv.DictWriter(file, fieldnames=fieldnames)
     writer.writeheader()
